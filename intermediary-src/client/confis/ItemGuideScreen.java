@@ -60,6 +60,8 @@ public class ItemGuideScreen extends ConfisScreen {
         filter();
         search.method_46421(px + 8); search.method_46419(py + 30); search.method_25358(150);
         method_37063(search);
+        setFocused(search);          // the screen is rebuilt after every letter: keep the box focused so you can keep typing
+        search.setFocused(true);
         int per = COLS * ROWS;
         int pages = Math.max(1, (shown.size() + per - 1) / per);
         page = Math.min(page, pages - 1);
@@ -79,6 +81,8 @@ public class ItemGuideScreen extends ConfisScreen {
             g.method_51427(shown.get(page * per + n), px + 9 + (n % COLS) * SLOT, py + 53 + (n / COLS) * SLOT);
         g.method_25300(field_22793, (page + 1) + "/" + pages + "  (" + shown.size() + " items)",
                 px + 8 + COLS * SLOT / 2, py + ph - 17, 0xFFFFFFFF);
+
+        if (shown.isEmpty()) g.method_51433(field_22793, "No items found.", px + 10, py + 56, 0xFF7A7A7A, true);
 
         int dx = px + 8 + COLS * SLOT + 10, dw = pw - (dx - px) - 8;
         g.method_25294(dx - 5, py + 28, dx - 4, py + ph - 8, 0xFF3A3A3A);
