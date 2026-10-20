@@ -98,7 +98,7 @@ public class ItemGuideScreen extends ConfisScreen {
                 dx + 56, py + 58, 0xFFCCCCCC, true);
 
         int y = GuidePanel.draw(g, mc, selected, dx, py + 76, dw);
-        List<class_2561> tip = selected.method_7950(class_1792.class_9635.field_51353, mc.field_1724, class_1836.field_41070);
+        List<class_2561> tip = selected.method_7950(class_1792.TooltipContext.field_51353, mc.field_1724, class_1836.field_41070);
         for (int i = 1; i < tip.size(); i++)                       // line 0 is the name, already shown
             for (class_5481 l : field_22793.method_1728(tip.get(i), dw)) {
                 if (y > py + ph - 14) return;
