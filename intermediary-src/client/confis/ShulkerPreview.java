@@ -9,6 +9,7 @@ import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ContainerComponent;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
+import org.lwjgl.glfw.GLFW;
 
 /** Shift + hover a shulker box in any inventory: shows its 27 slots instead of the vanilla tooltip. */
 public final class ShulkerPreview {
@@ -18,9 +19,16 @@ public final class ShulkerPreview {
         return !s.isEmpty() && s.getItem() instanceof BlockItem bi && bi.getBlock() instanceof ShulkerBoxBlock;
     }
 
+    /** Shift held (either key). Read straight from GLFW so it does not depend on Screen helpers that change between versions. */
+    private static boolean shiftDown() {
+        long w = GLFW.glfwGetCurrentContext();
+        return w != 0L && (GLFW.glfwGetKey(w, GLFW.GLFW_KEY_LEFT_SHIFT) == GLFW.GLFW_PRESS
+                || GLFW.glfwGetKey(w, GLFW.GLFW_KEY_RIGHT_SHIFT) == GLFW.GLFW_PRESS);
+    }
+
     public static boolean wanted(ItemStack s) {
         Module m = Modules.byId("shulker");
-        return m != null && m.cfg().enabled && Screen.hasShiftDown() && isShulker(s);
+        return m != null && m.cfg().enabled && shiftDown() && isShulker(s);
     }
 
     public static void draw(DrawContext g, MinecraftClient mc, ItemStack box, int mx, int my) {
