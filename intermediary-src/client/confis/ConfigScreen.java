@@ -159,7 +159,7 @@ public class ConfigScreen extends class_437 {
     // --------------------------------------------------------------- widgets
     private boolean button(class_332 g, int x, int y, int w, int h, String label, int fill, int textCol) {
         boolean hov = in(x, y, w, h);
-        g.method_25294(x, y, x + w, y + h, hov ? lighten(fill, 28) : fill);
+        Glass.button(g, x, y, w, h, fill, hov);
         g.method_25300(this.field_22793, label, x + w / 2, y + (h - 8) / 2, textCol);
         return clickIn(x, y, w, h);
     }
@@ -172,10 +172,11 @@ public class ConfigScreen extends class_437 {
         if (down && id.equals(activeSlider)) {
             v = Math.max(0f, Math.min(1f, (mx - x) / (float) w));
         }
-        g.method_25294(x, y, x + w, y + h, 0xFF1A1A1A);
-        g.method_25294(x, y, x + Math.round(w * v), y + h, 0xFF8C8C8C);
-        int kx = x + Math.round((w - 2) * v);
-        g.method_25294(kx, y - 1, kx + 2, y + h + 1, 0xFFFFFFFF);
+        Glass.fillRound(g, x, y, w, h, 4, 0x70000000);
+        int fw = Math.round(w * v);
+        if (fw > 0) Glass.fillRound(g, x, y, Math.max(fw, 3), h, 4, 0xB08C8C8C);
+        int kx = x + Math.round((w - 3) * v);
+        Glass.fillRound(g, kx, y - 1, 3, h + 2, 2, 0xFFFFFFFF);
         g.method_51433(this.field_22793, tag, x + 3, y + 1, 0xFFFFFFFF, true);
         return v;
     }
@@ -279,10 +280,9 @@ public class ConfigScreen extends class_437 {
         py = (this.field_22790 - ph) / 2;
         int accent = opaque(cfg.accent);
 
-        outline(g, px - 1, py - 1, pw + 2, ph + 2, accent);
-        g.method_25294(px, py, px + pw, py + ph, cfg.panelBg);
-        g.method_25294(px, py, px + pw, py + 24, darken(cfg.panelBg, 6));
-        g.method_25294(px, py + 24, px + pw, py + 25, LINE);
+        // liquid glass window: translucent, so the blurred game shows through
+        Glass.panel(g, px, py, pw, ph, (cfg.panelBg & 0xFFFFFF) | (Math.min(cfg.panelBg >>> 24, 0xA6) << 24));
+        g.method_25294(px + 12, py + 24, px + pw - 12, py + 25, 0x28FFFFFF);
 
         // name on top of the menu
         class_2561 title = class_2561.method_43470(ConfisClient.NAME).method_27692(class_124.field_1067);
@@ -323,8 +323,7 @@ public class ConfigScreen extends class_437 {
         int sbX = toolsX - 6 - sbW;
         if (tab.ordinal() <= Tab.FAVORITES.ordinal()) {
             if (clicked) searchFocus = in(sbX, py + 5, sbW, 14);
-            g.method_25294(sbX, py + 5, sbX + sbW, py + 19, 0xFF000000);
-            outline(g, sbX, py + 5, sbW, 14, searchFocus ? accent : LINE);
+            Glass.field(g, sbX, py + 5, sbW, 14, searchFocus, accent);
             boolean caret = searchFocus && (System.currentTimeMillis() / 500) % 2 == 0;
             String shown = query.isEmpty() && !searchFocus ? "Search modules..." : query + (caret ? "_" : "");
             g.method_51433(this.field_22793, shown, sbX + 4, py + 8, query.isEmpty() && !searchFocus ? DIM : 0xFFFFFFFF, true);
@@ -401,8 +400,7 @@ public class ConfigScreen extends class_437 {
             if (y + chh < gy || y > gy + viewH) continue;
             boolean on = c.enabled;
 
-            g.method_25294(x, y, x + cw, y + chh, 0xFF0D0D0D);
-            outline(g, x, y, cw, chh, in(x, y, cw, chh) ? 0xFF9A9A9A : (on ? 0xFF5A5A5A : LINE));
+            Glass.card(g, x, y, cw, chh, in(x, y, cw, chh), on);
 
             g.method_51433(this.field_22793, m.name, x + 5, y + 5, on ? 0xFFFFFFFF : DIM, true);
 
@@ -421,7 +419,7 @@ public class ConfigScreen extends class_437 {
             // gear (options) + enabled/disabled bar
             int by = y + chh - 16;
             boolean gearHov = in(x + 4, by, 14, 12);
-            g.method_25294(x + 4, by, x + 18, by + 12, gearHov ? 0xFF3A3A3A : 0xFF222222);
+            Glass.button(g, x + 4, by, 14, 12, 0xFF2A2A2A, gearHov);
             Icons.draw(g, "gear", x + 7, by + 2, 1, 0xFFFFFFFF);
             if (clickIn(x + 4, by, 14, 12)) {
                 optMod = m;
@@ -438,10 +436,10 @@ public class ConfigScreen extends class_437 {
         clicked = savedClicked && clicked;
         if (maxScroll > 0) {
             int tx = px + pw - 5, th = viewH;
-            g.method_25294(tx, gy, tx + 3, gy + th, 0xFF1A1A1A);
+            Glass.fillRound(g, tx, gy, 3, th, 2, 0x30FFFFFF);
             int kh = Math.max(16, th * viewH / contentH);
             int ky = gy + (th - kh) * scroll / maxScroll;
-            g.method_25294(tx, ky, tx + 3, ky + kh, 0xFF8C8C8C);
+            Glass.fillRound(g, tx, ky, 3, kh, 2, 0xA0FFFFFF);
         }
     }
 
@@ -634,8 +632,7 @@ if (button(g, lx, by, w, 14, "Name badge (C): " + (cfg.nameBadge ? "ON" : "OFF")
             if (idx >= cfg.waypointList.size()) break;
             Waypoint w = cfg.waypointList.get(idx);
             int y = top + n * rowH;
-            g.method_25294(px + 8, y, px + pw - 8, y + rowH - 2, 0xFF0D0D0D);
-            outline(g, px + 8, y, pw - 16, rowH - 2, LINE);
+            Glass.card(g, px + 8, y, pw - 16, rowH - 2, false, false);
 
             g.method_25294(px + 11, y + 2, px + 24, y + 13, 0xFFFFFFFF);
             g.method_25294(px + 12, y + 3, px + 23, y + 12, opaque(w.color));
